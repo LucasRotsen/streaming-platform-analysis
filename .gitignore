@@ -1,0 +1,12 @@
+# Virtual Environments
+.env/
+.venv/
+
+# Jupyter Stuff
+.ipynb_checkpoints/
+
+# PyCharm Stuff
+.idea/
+
+# Datasets
+data/
