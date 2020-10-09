@@ -1,6 +1,7 @@
-jupyter
-pandas
 numpy
-streamlit
+pandas
+plotly
+jupyter
 seaborn
+streamlit
 matplotlib
