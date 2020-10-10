@@ -9,4 +9,4 @@ Instale os requisitos necessários:
 
 Execute o data app:
 
-`streamlit run src/app.py`
+`streamlit run src/app/app.py`
