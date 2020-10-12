@@ -8,6 +8,11 @@ import plotly.graph_objects as go
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
+dataframe_loc = '/home/lucasrotsen/Git_Repos/streaming-platform-analysis/data/consolidated_df.csv'
+
+df = pd.read_csv(dataframe_loc, sep='|')
+df.drop(['Unnamed: 0'], axis=1, inplace=True)
+
 
 def menu():
     menu_dispatcher = {
@@ -49,7 +54,6 @@ def intro():
         2. A maior parte dos filmes do Disney Plus tem classificação etária < 16 anos
         3. Filmes de terror têm notas inferiores no IMDB
         4. Filmes que foram indicados ao Oscar têm as maiores notas no IMDB 
-        5. As plataformas de streaming focam em títulos diferentes para atingir porções diferentes do mercado
     '''
 
     st.header('Fatos e Julgamentos')
@@ -85,11 +89,6 @@ def eda():
     st.title('Análise Exploratória dos Dados')
 
     st.text('')
-
-    dataframe_loc = '/home/lucasrotsen/Git_Repos/streaming-platform-analysis/data/consolidated_df.csv'
-
-    df = pd.read_csv(dataframe_loc, sep='|')
-    df.drop(['Unnamed: 0'], axis=1, inplace=True)
 
     st.markdown('#### De quando é o filme mais antigo do dataset? Que filme é esse?')
 
@@ -290,21 +289,17 @@ def eda():
 
     fig, ax = plt.subplots(figsize=(12, 10))
 
-    # mask
     mask = np.triu(np.ones_like(df_corr, dtype=np.bool))
 
-    # adjust mask and df
     mask = mask[1:, :-1]
     corr = df_corr.iloc[1:, :-1].copy()
 
-    # color map
     cmap = sns.diverging_palette(0, 230, 90, 60, as_cmap=True)
 
-    # plot heatmap
     sns.heatmap(corr, mask=mask, annot=True, fmt=".2f",
                 linewidths=5, cmap=cmap, vmin=-1, vmax=1,
                 cbar_kws={"shrink": .8}, square=True)
-    # ticks
+
     yticks = [i.upper() for i in corr.index]
     xticks = [i.upper() for i in corr.columns]
     plt.yticks(plt.yticks()[0], labels=yticks, rotation=0)
@@ -322,21 +317,44 @@ def hypothesis_testing():
 
     st.text('')
 
+    st.markdown('Através do gráfico abaixo podemos observar que não há correlação clara entre as variáveis:')
+
+    fig = px.scatter(df, x='MOVIE_AGE', y='IMDB')
+    st.plotly_chart(fig)
+
+    st.markdown('Ainda assim um fato curioso pode ser observado. A distribuição das notas no IMDB parece se afunilar'
+                ' conforme a idade dos filmes aumenta. Filmes que possuem entre 80 e 100 anos , por exemplo, possuem a '
+                ' maior parte das notas distribuídas entre 4 e 8.')
+
     st.markdown('#### A maior parte dos filmes do Disney Plus tem classificação etária < 16 anos')
 
     st.text('')
+
+    st.markdown('Conforme pode ser observado na tabela abaixo, de fato a maior parte dos filmes dos Disney + possui '
+                'faixa etária livre ou inferior à 16 anos.')
+
+    st.table(df[df['DISNEY_PLUS'] == 1]['AGE_CLASSIFICATION'].value_counts())
 
     st.markdown('#### Filmes de terror têm notas inferiores no IMDB')
 
     st.text('')
 
+    st.markdown('A tabela abaixo apresenta os gêneros dos 10 filmes com menores notas no IMDB. Podemos observar que '
+                'entre eles há, de fato, filmes de terror.')
+
+    st.table(df.sort_values(by=['IMDB'])[['GENRES', 'IMDB']].head(10))
+
     st.markdown('#### Filmes que foram indicados ao Oscar têm as maiores notas no IMDB')
 
     st.text('')
 
-    st.markdown('#### As plataformas de streaming focam em títulos diferentes para atingir porções diferentes do mercado')
+    st.markdown(f"A maior nota no IMDB dos filmes deste dataset é **{df['IMDB'].max()}**")
 
-    st.text('')
+    sorted_df = df[df['WON_OSCAR_CATEGORY'] == 1]
+    sorted_df = sorted_df.sort_values(by=['IMDB'], ascending=False)[['TITLE', 'IMDB']].head(10)
+
+    fig = px.bar(sorted_df, x='TITLE', y='IMDB', color='IMDB', height=600)
+    st.plotly_chart(fig)
 
 
 if __name__ == '__main__':
