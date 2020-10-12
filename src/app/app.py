@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-dataframe_loc = '/home/lucasrotsen/Git_Repos/streaming-platform-analysis/data/consolidated_df.csv'
+dataframe_loc = '../../data/consolidated_df.csv'
 
 df = pd.read_csv(dataframe_loc, sep='|')
 df.drop(['Unnamed: 0'], axis=1, inplace=True)
